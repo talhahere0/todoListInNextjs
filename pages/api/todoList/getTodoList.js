@@ -3,11 +3,11 @@ import AddList from "../../../models/AddList";
 
 const handler = async (req, res) => {
   await dbConnect();
-  const get_task = await AddList.find();
+  const tasks = await AddList.find().sort({ createdAt: -1 });
 
   res.status(200).json({
     status: "success",
-    get_task,
+    tasks,
   });
 };
 export default handler;

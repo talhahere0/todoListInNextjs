@@ -3,13 +3,13 @@ import AddList from "../../../models/AddList";
 
 const handler = async (req, res) => {
   await dbConnect();
-  const send_task = await AddList.create({
+  const new_task = await AddList.create({
     task: req.body.task,
   });
 
   res.status(200).json({
     status: "success",
-    send_task,
+    new_task,
   });
 };
 export default handler;

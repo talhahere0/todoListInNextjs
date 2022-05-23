@@ -1,9 +1,11 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { MdDeleteForever } from "react-icons/md";
+import { useRouter } from "next/router";
 
 const url = "http://localhost:3000/api/todoList";
 export default function Home() {
+  const router = useRouter();
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
 
@@ -51,6 +53,17 @@ export default function Home() {
     }
   };
 
+  const logoutUser = async (id) => {
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_PLATFORM_URL}/api/user/logoutUser`
+      );
+      router.push("/login");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <div className="flex mx-10 md:flex-row xs:flex-col gap-3 items-center justify-center mt-[5%]">
@@ -67,6 +80,12 @@ export default function Home() {
           className="py-[11px] px-5 flex bg-brand-4 w-fit text-sm text-white font-poppins rounded-lg"
         >
           Add Task
+        </button>
+        <button
+          onClick={logoutUser}
+          className="py-[11px] px-5 flex bg-brand-4 w-fit text-sm text-white font-poppins rounded-lg"
+        >
+          Logout
         </button>
       </div>
       <div className="flex items-center justify-center mt-[3%]">

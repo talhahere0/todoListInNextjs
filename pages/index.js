@@ -2,14 +2,27 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { MdDeleteForever } from "react-icons/md";
 import { useRouter } from "next/router";
+import { useSelector } from "react-redux";
 
 const url = "http://localhost:3000/api/todoList";
 export default function Home() {
   const router = useRouter();
+  const userLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const user = useSelector((state) => state.user);
+  console.log("token", user);
+
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      console.log("loggin", userLoggedIn);
+      if (!userLoggedIn) {
+        router.replace("/login");
+        return;
+      }
+    }
+
     axios
       .get(`${process.env.NEXT_PUBLIC_PLATFORM_URL}/api/todoList/getTodoList`)
       .then((jsonRes) => {
@@ -65,49 +78,48 @@ export default function Home() {
   };
 
   return (
-    <>
-      <div className="flex mx-10 md:flex-row xs:flex-col gap-3 items-center justify-center mt-[5%]">
-        <input
-          onChange={(event) => {
-            setNewTask(event.target.value);
-          }}
-          value={newTask}
-          type="text"
-          className="py-[11px] px-5 max-w-[700px] flex-grow outline-brand-5 font-poppins text-sm border-brand-5 border rounded-lg"
-        />
-        <button
-          onClick={addTask}
-          className="py-[11px] px-5 flex bg-brand-4 w-fit text-sm text-white font-poppins rounded-lg"
-        >
-          Add Task
-        </button>
-        <button
-          onClick={logoutUser}
-          className="py-[11px] px-5 flex bg-brand-4 w-fit text-sm text-white font-poppins rounded-lg"
-        >
-          Logout
-        </button>
-      </div>
-      <div className="flex items-center justify-center mt-[3%]">
-        <div className="">
-          {tasks.map((t) => {
-            return (
-              <>
-                <p
-                  key={t}
-                  className="sm:w-[500px] xs:w-[300px] bg-brand-3 mb-3 bg-opacity-20 h-11 flex justify-between rounded text-brand-3 font-bold font-poppins p-2.5"
-                >
-                  {t.task}
-                  <MdDeleteForever
-                    onClick={() => deleteTask(t._id)}
-                    className="float-right text-red-600 text-[25px] hover:scale-125"
-                  />
-                </p>
-              </>
-            );
-          })}
+    userLoggedIn && (
+      <div>
+        <div className="flex mx-10 md:flex-row xs:flex-col gap-3 items-center justify-center mt-[5%]">
+          <input
+            onChange={(event) => {
+              setNewTask(event.target.value);
+            }}
+            value={newTask}
+            type="text"
+            className="py-[11px] px-5 max-w-[700px] flex-grow outline-brand-5 font-poppins text-sm border-brand-5 border rounded-lg"
+          />
+          <button
+            onClick={addTask}
+            className="py-[11px] px-5 flex bg-brand-4 w-fit text-sm text-white font-poppins rounded-lg"
+          >
+            Add Task
+          </button>
+          <button
+            onClick={logoutUser}
+            className="py-[11px] px-5 flex bg-brand-4 w-fit text-sm text-white font-poppins rounded-lg"
+          >
+            Logout
+          </button>
+        </div>
+        <div className="flex items-center justify-center mt-[3%]">
+          <div className="">
+            {tasks.map((t) => {
+              return (
+                <div key={t}>
+                  <p className="sm:w-[500px] xs:w-[300px] bg-brand-3 mb-3 bg-opacity-20 h-11 flex justify-between rounded text-brand-3 font-bold font-poppins p-2.5">
+                    {t.task}
+                    <MdDeleteForever
+                      onClick={() => deleteTask(t._id)}
+                      className="float-right text-red-600 text-[25px] hover:scale-125"
+                    />
+                  </p>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
-    </>
+    )
   );
 }

@@ -7,7 +7,6 @@ import cookie from "cookie";
 
 const handler = asyncHandler(async (req, res) => {
   await dbConnect();
-
   const { email, password } = req.body;
 
   // Generate the jwt
@@ -19,19 +18,21 @@ const handler = asyncHandler(async (req, res) => {
 
   const user = await UserModel.findOne({ email });
   if (user && (await bcrypt.compare(password, user.password))) {
+    let jwtToken = generateToken(user._id);
     res.setHeader(
       "Set-Cookie",
-      cookie.serialize("token", generateToken(user._id), {
+      cookie.serialize("token", jwtToken, {
         httpOnly: true,
         maxAge: 60 * 24,
         path: "/",
       })
     );
+    console.log("user", user);
     res.status(200).json({
       _id: user.id,
       username: user.username,
       email: user.email,
-      user,
+      token: jwtToken,
     });
   } else {
     res.status(400).json({

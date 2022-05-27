@@ -3,8 +3,12 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useDispatch } from "react-redux";
+import { LOG_IN } from "../redux/store/actions/user.actions";
 
 export default function Login() {
+  const dispatch = useDispatch();
+
   const router = useRouter();
   const [login, setLogin] = useState({
     email: "",
@@ -14,8 +18,13 @@ export default function Login() {
   const loggedIn = () => {
     axios
       .post(`${process.env.NEXT_PUBLIC_PLATFORM_URL}/api/user/loginUser`, login)
+
       .then((jsonRes) => {
         setLogin(jsonRes.data.user);
+        dispatch({
+          type: LOG_IN,
+          payload: jsonRes.data,
+        });
         setLogin((prev) => {
           return {
             ...prev,
@@ -37,13 +46,14 @@ export default function Login() {
         router.push("/");
       })
       .catch((error) => {
-        console.log(error.response);
-
-        toast.warning(error.response.data.message || "Something went wrong!", {
-          theme: "dark",
-          position: "top-right",
-          autoClose: 5000,
-        });
+        toast.warning(
+          error.response?.data?.message || "Something went wrong!",
+          {
+            theme: "dark",
+            position: "top-right",
+            autoClose: 5000,
+          }
+        );
       });
   };
 

@@ -1,6 +1,5 @@
 import dbConnect from "../../../utils/connection/mongodbConnection";
 import UserModel from "../../../models/UserModel";
-import auth from "../../../middleware/auth";
 const asyncHandler = require("express-async-handler");
 
 const handler = asyncHandler(async (req, res) => {
@@ -13,4 +12,4 @@ const handler = asyncHandler(async (req, res) => {
     getUser,
   });
 });
-export default auth(handler);
+export default handler;
